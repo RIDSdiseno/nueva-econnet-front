@@ -1,0 +1,57 @@
+/* Econnet · el sistema visual, en tokens.
+   Tailwind 4 se configura aquí mismo: los colores y tamaños viven en @theme y
+   no en clases sueltas repartidas por los componentes. */
+@import "tailwindcss";
+
+@theme {
+  --color-fondo: #07090f;
+  --color-fondo-2: #0a0d15;
+  --color-panel: #0f1420;
+  --color-linea: rgb(255 255 255 / 9%);
+  --color-linea-fuerte: rgb(255 255 255 / 16%);
+  --color-tinta: #e9eefb;
+  --color-tinta-2: #b9c3dc;
+  --color-apagado: #828fac;
+  --color-azul: #2b6bff;
+  --color-azul-claro: #5c8cff;
+  --color-verde: #32c173;
+  --color-ambar: #e9a93f;
+  --color-rojo: #ff7a7a;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --radius-marco: 20px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-fondo);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    letter-spacing: -0.011em;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    font-weight: 600;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-azul-claro);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

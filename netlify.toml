@@ -1,0 +1,49 @@
+# Econnet · frontend-react — configuración de Netlify.
+# Equivalente al vercel.json, adaptado a la sintaxis de Netlify.
+#
+# ANTES DE HACER DEPLOY:
+# 1. En Netlify → Site settings → Environment variables, agrega:
+#      VITE_API_URL = https://TU-PROYECTO.up.railway.app
+# 2. En este archivo, reemplaza TODAS las ocurrencias de
+#    «https://TU-PROYECTO.up.railway.app» por esa misma URL (aparece en el CSP).
+
+[build]
+  command     = "npm run build"
+  publish     = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# ── SPA fallback ──────────────────────────────────────────────────────────────
+# Cualquier ruta que no corresponda a un archivo real se sirve como index.html;
+# React Router se encarga del resto. Status 200 (no redirección).
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# ── Panel de inventario: sin indexación ni caché ──────────────────────────────
+[[headers]]
+  for = "/panel"
+  [headers.values]
+    X-Robots-Tag  = "noindex, nofollow"
+    Cache-Control = "no-store"
+
+# ── Assets con hash: caché inmutable un año ───────────────────────────────────
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ── Cabeceras de seguridad para todas las rutas ───────────────────────────────
+# connect-src e img-src incluyen la URL del backend en Railway.
+# Reemplaza «https://TU-PROYECTO.up.railway.app» por tu URL real.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy   = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.econnet.cl https://TU-PROYECTO.up.railway.app; font-src 'self'; connect-src 'self' https://api.econnet.cl https://TU-PROYECTO.up.railway.app; form-action 'self' https://webpay3g.transbank.cl https://webpay3gint.transbank.cl; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Content-Type-Options    = "nosniff"
+    X-Frame-Options           = "DENY"
+    Referrer-Policy           = "strict-origin-when-cross-origin"
+    Permissions-Policy        = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
