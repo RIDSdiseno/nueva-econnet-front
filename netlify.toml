@@ -1,11 +1,9 @@
 # Econnet · frontend-react — configuración de Netlify.
 # Equivalente al vercel.json, adaptado a la sintaxis de Netlify.
 #
-# ANTES DE HACER DEPLOY:
-# 1. En Netlify → Site settings → Environment variables, agrega:
-#      VITE_API_URL = https://TU-PROYECTO.up.railway.app
-# 2. En este archivo, reemplaza TODAS las ocurrencias de
-#    «https://TU-PROYECTO.up.railway.app» por esa misma URL (aparece en el CSP).
+# Backend en Railway: https://nueva-econnet-back-production.up.railway.app
+# En Netlify → Site settings → Environment variables, agrega:
+#   VITE_API_URL = https://nueva-econnet-back-production.up.railway.app
 
 [build]
   command     = "npm run build"
@@ -41,7 +39,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy   = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.econnet.cl https://TU-PROYECTO.up.railway.app; font-src 'self'; connect-src 'self' https://api.econnet.cl https://TU-PROYECTO.up.railway.app; form-action 'self' https://webpay3g.transbank.cl https://webpay3gint.transbank.cl; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+    Content-Security-Policy   = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.econnet.cl https://nueva-econnet-back-production.up.railway.app; font-src 'self'; connect-src 'self' https://api.econnet.cl https://nueva-econnet-back-production.up.railway.app; form-action 'self' https://webpay3g.transbank.cl https://webpay3gint.transbank.cl; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
     X-Content-Type-Options    = "nosniff"
     X-Frame-Options           = "DENY"
