@@ -117,6 +117,9 @@ export const api = {
 
   crearPedido: (cuerpo: Record<string, unknown>) => pedir<RespuestaPedido>("/api/pedido", { cuerpo, trampa: true }),
 
+  pasarelas: () =>
+    pedir<{ ok: true; pasarelas: Array<"webpay" | "mercadopago"> }>("/api/pasarelas").then((r) => r.pasarelas),
+
   seguimiento: (numero: string, correo: string) =>
     pedir<{ ok: true; pedido: Seguimiento }>(
       `/api/seguimiento?numero=${encodeURIComponent(numero)}&correo=${encodeURIComponent(correo)}`

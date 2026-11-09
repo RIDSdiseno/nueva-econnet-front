@@ -12,6 +12,21 @@ import { useCarrito } from "../features/carrito/useCarrito.js";
 import { REGIONES, rutValido } from "../features/checkout/regiones.js";
 import { comprar as eventoComprar, empezarCheckout } from "../features/analitica/eventos.js";
 
+type MetodoPago = "webpay" | "mercadopago";
+
+const ETIQUETAS: Record<MetodoPago, { titulo: string; subtitulo: string; logo: string }> = {
+  webpay: {
+    titulo: "Webpay",
+    subtitulo: "Tarjeta de crédito o débito",
+    logo: "https://www.webpay.cl/assets/logo-webpay.svg"
+  },
+  mercadopago: {
+    titulo: "Mercado Pago",
+    subtitulo: "Tarjeta, débito, cuotas o transferencia",
+    logo: "https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.22/mercadopago/logo__large@2x.png"
+  }
+};
+
 const clave = () => {
   const guardada = sessionStorage.getItem("econnet:idem");
   if (guardada) return guardada;
@@ -88,6 +103,15 @@ export function Checkout() {
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [metodosPago, setMetodosPago] = useState<MetodoPago[]>([]);
+  const [metodoPago, setMetodoPago] = useState<MetodoPago | null>(null);
+
+  useEffect(() => {
+    api.pasarelas().then((lista) => {
+      setMetodosPago(lista);
+      if (lista.length === 1) setMetodoPago(lista[0]);
+    }).catch(() => {/* sin selector si falla */});
+  }, []);
 
   const cambiar = (campo: keyof Campos) => (e: { target: { value: string } }) =>
     setCampos((previos) => ({ ...previos, [campo]: e.target.value }));
@@ -156,6 +180,7 @@ export function Checkout() {
       if (!campos.razonSocial.trim()) nuevos.razonSocial = "Falta la razón social.";
       if (!campos.giro.trim()) nuevos.giro = "Falta el giro.";
     }
+    if (metodosPago.length > 1 && !metodoPago) nuevos.metodoPago = "Elige cómo quieres pagar.";
     setErrores(nuevos);
     return Object.keys(nuevos).length === 0;
   }
@@ -188,6 +213,7 @@ export function Checkout() {
               },
         ...(campos.cupon ? { cupon: campos.cupon } : {}),
         ...(carritoId ? { carritoId } : {}),
+        ...(metodoPago ? { pasarela: metodoPago } : {}),
         idempotencia: clave(),
         terminos: true as const,
         consentimiento: aceptaMarketing,
@@ -450,6 +476,47 @@ export function Checkout() {
               aria-label="Cupón"
             />
           </div>
+
+          {metodosPago.length > 1 && (
+            <div className="mt-4">
+              <p className="mb-2 text-[13px] font-medium text-tinta-2">Método de pago</p>
+              <div className="grid gap-2">
+                {metodosPago.map((m) => {
+                  const info = ETIQUETAS[m];
+                  const activo = metodoPago === m;
+                  return (
+                    <label
+                      key={m}
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-colors ${
+                        activo ? "border-azul bg-azul/10" : "border-linea-fuerte hover:border-azul/40"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="metodoPago"
+                        className="accent-azul"
+                        checked={activo}
+                        onChange={() => setMetodoPago(m)}
+                      />
+                      <img
+                        src={info.logo}
+                        alt={info.titulo}
+                        className="h-6 w-auto object-contain"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                      <span>
+                        <b className="block text-[14px]">{info.titulo}</b>
+                        <small className="text-[12px] text-apagado">{info.subtitulo}</small>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              {errores.metodoPago && (
+                <span className="mt-1 block text-[12.5px] text-rojo">{errores.metodoPago}</span>
+              )}
+            </div>
+          )}
 
           {avisoNoCobro && (
             <p className="mt-4 rounded-xl border border-ambar/40 bg-ambar/10 p-3 text-[13.5px] text-[#F0C27A]">{avisoNoCobro}</p>
